@@ -14,6 +14,7 @@ import jwt
 from passlib.context import CryptContext
 import base64
 import json
+from fastapi.middleware.cors import CORSMiddleware
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -31,6 +32,19 @@ security = HTTPBearer()
 
 # Create the main app
 app = FastAPI()
+origins = [
+    "https://cantina-pdd-project.vercel.app",
+    "https://cantina-pdd-project-git-main-john-oliveiras-projects.vercel.app"
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+ )
+
 api_router = APIRouter(prefix="/api")
 
 # Models
