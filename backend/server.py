@@ -1,4 +1,4 @@
-from fastapi import FastAPI, APIRouter, HTTPException, Depends, UploadFile, File, Form, Body  
+from fastapi import FastAPI, APIRouter, HTTPException, Depends, UploadFile, File, Form, Body
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
@@ -14,7 +14,6 @@ import jwt
 from passlib.context import CryptContext
 import base64
 import json
-from fastapi.middleware.cors import CORSMiddleware
 
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -31,19 +30,8 @@ JWT_ALGORITHM = "HS256"
 security = HTTPBearer()
 
 # Create the main app
-app = FastAPI(title="Cantina Projeto de Deus API", openapi_prefix="/api")
-origins = [
-    "https://cantina-pdd-project.vercel.app",
-    "https://cantina-pdd-project-git-main-john-oliveiras-projects.vercel.app"
-]
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
- )
+app = FastAPI()
+api_router = APIRouter()
 
 # Models
 class User(BaseModel):
@@ -586,6 +574,7 @@ async def get_pending_transactions(current_user: User = Depends(require_admin)):
     return {"count": count}
 
 # Include the router
+app.include_router(api_router, prefix="/api")
 
 app.add_middleware(
     CORSMiddleware,
