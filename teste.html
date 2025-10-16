@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Conexão Frontend-Backend</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; background-color: #f4f4f9; }
+        h1 { color: #333; }
+        button { font-size: 16px; padding: 10px 20px; cursor: pointer; background-color: #007bff; color: white; border: none; border-radius: 5px; }
+        #resultado { margin-top: 20px; padding: 15px; background-color: white; border: 1px solid #ddd; border-radius: 5px; }
+        #status { font-weight: bold; }
+        .sucesso { color: green; }
+        .falha { color: red; }
+        ul { padding-left: 20px; }
+    </style>
+</head>
+<body>
+
+    <h1>Teste de Conexão Direta</h1>
+    <p>Este teste tentará se conectar ao seu backend e buscar a lista de produtos.</p>
+    
+    <button onclick="buscarProdutos()">Buscar Produtos</button>
+
+    <div id="resultado">
+        <p>Status: <span id="status">Aguardando teste...</span></p>
+        <ul id="lista-produtos"></ul>
+    </div>
+
+    <script>
+        async function buscarProdutos() {
+            const statusEl = document.getElementById('status');
+            const listaEl = document.getElementById('lista-produtos');
+            
+            // Limpa resultados anteriores
+            statusEl.textContent = 'Buscando...';
+            statusEl.className = '';
+            listaEl.innerHTML = '';
+
+            // URL do seu backend que já sabemos que funciona
+            const url = 'https://cantina-pdd-backend.onrender.com/api/products';
+
+            try {
+                const response = await fetch(url );
+
+                if (!response.ok) {
+                    // Se a resposta não for OK (ex: 404, 500)
+                    throw new Error(`Erro na rede: ${response.status} ${response.statusText}`);
+                }
+
+                const produtos = await response.json();
+
+                // Se chegou aqui, a conexão foi um SUCESSO
+                statusEl.textContent = 'SUCESSO! Produtos recebidos do backend.';
+                statusEl.className = 'sucesso';
+
+                if (produtos.length === 0) {
+                    listaEl.innerHTML = '<li>O backend respondeu, mas a lista de produtos está vazia.</li>';
+                } else {
+                    produtos.forEach(produto => {
+                        const item = document.createElement('li');
+                        item.textContent = `Nome: ${produto.name}, Preço: R$ ${produto.price}`;
+                        listaEl.appendChild(item);
+                    });
+                }
+
+            } catch (error) {
+                // Se caiu aqui, a conexão FALHOU
+                statusEl.textContent = `FALHA! Não foi possível conectar ao backend.`;
+                statusEl.className = 'falha';
+                
+                const erroItem = document.createElement('li');
+                erroItem.textContent = `Detalhe do erro: ${error.message}. Verifique o console do navegador (F12) para mais informações.`;
+                listaEl.appendChild(erroItem);
+                
+                console.error('Erro detalhado:', error);
+            }
+        }
+    </script>
+
+</body>
+</html>
